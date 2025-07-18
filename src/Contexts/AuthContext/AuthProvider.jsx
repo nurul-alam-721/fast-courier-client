@@ -13,7 +13,7 @@ import { auth } from '../../firebase/firebase.init';
 const googleProvider = new GoogleAuthProvider();
 
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const createUser = (email, password) => {
@@ -31,7 +31,7 @@ const AuthProvider = ({ children }) => {
     return signInWithPopup(auth, googleProvider);
   };
 
-  const logOutUser = () => {
+  const signOutUser = () => {
     setLoading(true);
     return signOut(auth);
   };
@@ -53,7 +53,7 @@ const AuthProvider = ({ children }) => {
     setUser,
     signInUser,
     loginWithGoogle,
-    logOutUser,
+    signOutUser,
   };
 
   return (
