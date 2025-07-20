@@ -26,14 +26,13 @@ const MyParcels = () => {
       html: `
         <p><strong>Title:</strong> ${parcel.title}</p>
         <p><strong>Type:</strong> ${parcel.type}</p>
-        <p><strong>Weight:</strong> ${parcel.weight} kg</p>
-        <p><strong>Sender:</strong> ${parcel.senderName} (${parcel.senderEmail})</p>
-        <p><strong>Receiver:</strong> ${parcel.receiverName} (${parcel.receiverPhoneNumber})</p>
-        <p><strong>Delivery Address:</strong> ${parcel.deliveryAddress}</p>
-        <p><strong>Requested Date:</strong> ${parcel.requestedDeliveryDate}</p>
+        <p><strong>Weight:</strong> ${parcel.weight || 'N/A'} kg</p>
+        <p><strong>Sender:</strong> ${parcel.sender_name} (${parcel.sender_contact})</p>
+        <p><strong>Receiver:</strong> ${parcel.receiver_name} (${parcel.receiver_contact})</p>
+        <p><strong>Delivery Address:</strong> ${parcel.receiver_address}</p>
         <p><strong>Cost:</strong> ৳${parcel.cost}</p>
         <p><strong>Payment Status:</strong> <span class="capitalize">${parcel.payment_status}</span></p>
-        <p><strong>Booking Date:</strong> ${new Date(parcel.createdAt).toLocaleString()}</p>
+        <p><strong>Booking Date:</strong> ${new Date(parcel.creation_date).toLocaleString('en-GB')}</p>
       `,
       icon: 'info',
       confirmButtonText: 'Close',
@@ -41,38 +40,38 @@ const MyParcels = () => {
   };
 
   const handlePay = (id) => {
-    navigate(`/dashboard/payment/${id}`)
+    navigate(`/dashboard/payment/${id}`);
   };
 
   const handleDelete = async (parcel) => {
-  const confirm = await Swal.fire({
-    title: `Delete "${parcel.title}"?`,
-    text: 'This action is permanent.',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Yes, delete it!',
-  });
+    const confirm = await Swal.fire({
+      title: `Delete "${parcel.title}"?`,
+      text: 'This action is permanent.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+    });
 
-  if (!confirm.isConfirmed) return;
+    if (!confirm.isConfirmed) return;
 
-  setDeletingId(parcel._id);
-  try {
-    const res = await axiosSecure.delete(`/parcels/${parcel._id}`);
-    if (res.data.success) {
-      await Swal.fire('Deleted!', res.data.message, 'success');
-      refetch();
-    } else {
-      throw new Error(res.data.message);
+    setDeletingId(parcel._id);
+    try {
+      const res = await axiosSecure.delete(`/parcels/${parcel._id}`);
+      if (res.data.success) {
+        await Swal.fire('Deleted!', res.data.message, 'success');
+        refetch();
+      } else {
+        throw new Error(res.data.message);
+      }
+    } catch (error) {
+      console.error('Delete failed:', error);
+      Swal.fire('Error', error.message || 'Something went wrong.', 'error');
+    } finally {
+      setDeletingId(null);
     }
-  } catch (error) {
-    console.error('Delete failed:', error);
-    Swal.fire('Error', error.message || 'Something went wrong.', 'error');
-  } finally {
-    setDeletingId(null);
-  }
-};
+  };
 
   if (isLoading) {
     return <div className="text-center py-10">Loading your parcels...</div>;
@@ -88,7 +87,6 @@ const MyParcels = () => {
             <th>Title</th>
             <th>Type</th>
             <th>Booking Date</th>
-            <th>Requested Date</th>
             <th>Cost</th>
             <th>Status</th>
             <th>Actions</th>
@@ -97,7 +95,9 @@ const MyParcels = () => {
         <tbody>
           {parcels.length === 0 ? (
             <tr>
-              <td colSpan="8" className="py-6 text-gray-500">No parcels found.</td>
+              <td colSpan="7" className="py-6 text-gray-500">
+                No parcels found.
+              </td>
             </tr>
           ) : (
             parcels.map((parcel, index) => (
@@ -105,8 +105,7 @@ const MyParcels = () => {
                 <td>{index + 1}</td>
                 <td>{parcel.title}</td>
                 <td className="capitalize">{parcel.type}</td>
-                <td>{new Date(parcel.createdAt).toLocaleDateString('en-GB')}</td>
-                <td>{parcel.requestedDeliveryDate}</td>
+                <td>{new Date(parcel.creation_date).toLocaleString('en-GB')}</td>
                 <td>৳{parcel.cost}</td>
                 <td>
                   <span
@@ -118,8 +117,21 @@ const MyParcels = () => {
                   </span>
                 </td>
                 <td className="flex flex-wrap gap-2 justify-center">
-                  <button onClick={() => handleView(parcel)} className="btn btn-xs btn-info">View</button>
-                <button onClick={() => handlePay(parcel._id)} className="btn btn-xs btn-warning">Pay</button>
+                  <button
+                    onClick={() => handleView(parcel)}
+                    className="btn btn-xs btn-info"
+                  >
+                    View
+                  </button>
+
+                  <button
+                    onClick={() => handlePay(parcel._id)}
+                    className="btn btn-xs btn-warning"
+                    disabled={parcel.payment_status === "paid"}
+                  >
+                    {parcel.payment_status === "paid" ? "Paid" : "Pay"}
+                  </button>
+
                   <button
                     onClick={() => handleDelete(parcel)}
                     disabled={deletingId === parcel._id}

@@ -3,16 +3,18 @@ import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import useAuth from "../../../Hooks/useAuth";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const PaymentForm = ({ id }) => {
-  const stripe = useStripe(); // Stripe instance
-  const elements = useElements(); // Stripe Elements
+  const stripe = useStripe();
+  const elements = useElements();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
-  // Fetch parcel info by ID
   const { isPending, data: parcelInfo } = useQuery({
     queryKey: ["parcels", id],
     queryFn: async () => {
@@ -43,11 +45,10 @@ const PaymentForm = ({ id }) => {
     setError("");
 
     // Create Payment Method
-    const { error: stripeError, paymentMethod } =
-      await stripe.createPaymentMethod({
-        type: "card",
-        card,
-      });
+    const { error: stripeError } = await stripe.createPaymentMethod({
+      type: "card",
+      card,
+    });
 
     if (stripeError) {
       setError(stripeError.message);
@@ -78,9 +79,9 @@ const PaymentForm = ({ id }) => {
       if (result.error) {
         setError(result.error.message);
       } else if (result.paymentIntent?.status === "succeeded") {
-        console.log("Payment succeeded:", result.paymentIntent);
-        //mark the parcel as paid and save payment history
-       const  paymentData = {
+        console.log("✅ Payment succeeded:", result.paymentIntent);
+
+        const paymentData = {
           parcelId: id,
           amount,
           transactionId: result.paymentIntent.id,
@@ -88,16 +89,35 @@ const PaymentForm = ({ id }) => {
           sender_name: parcelInfo.sender_name,
           paymentMethod: result.paymentIntent.payment_method_types,
           date: new Date(),
+          paid_at_string: new Date().toISOString(),
         };
-        const paymentRes = axiosSecure.post('/payments', paymentData);
-        if(paymentRes.data?.insertedId){
-          console.log('payment successful!!!!!')
+
+        // Save payment info to DB
+        const paymentRes = await axiosSecure.post("/payments", paymentData);
+
+        if (paymentRes.data?.insertedId) {
+          // Show success alert
+          await Swal.fire({
+            icon: "success",
+            title: "Payment Successful!",
+            text: `Your payment of ৳${amount} was successful.`,
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+          });
+
+          // Redirect to MyParcels page
+          navigate("/dashboard/myparcels");
+        } else {
+          console.error("⚠️ Payment DB insert failed");
+          setError("Payment succeeded but recording failed.");
         }
       } else {
-        console.log("Payment status:", result.paymentIntent?.status);
+        console.log("⚠️ Payment status:", result.paymentIntent?.status);
+        setError("Payment failed. Please try again.");
       }
     } catch (err) {
-      console.error("Payment error:", err);
+      console.error("❌ Payment error:", err);
       setError("Payment failed. Try again.");
     }
 

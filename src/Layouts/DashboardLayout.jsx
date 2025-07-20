@@ -1,8 +1,21 @@
 import React from "react";
 import Logo from "../Pages/Shared/Logo/Logo";
-import { Link, Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
+import {
+  MdHome,
+  MdLocalShipping,
+  MdSend,
+  MdPayment,
+  MdSearch,
+  MdPerson,
+} from "react-icons/md";
 
 const DashboardLayout = () => {
+  const activeClass =
+    "btn btn-primary justify-start w-full text-left flex items-center gap-2 text-black";
+  const inactiveClass =
+    "btn btn-ghost justify-start w-full text-left flex items-center gap-2";
+
   return (
     <div className="drawer lg:drawer-open">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
@@ -37,7 +50,7 @@ const DashboardLayout = () => {
 
         {/* Page content */}
         <main className="p-4 w-full">
-          <Outlet></Outlet>
+          <Outlet />
         </main>
       </div>
 
@@ -57,21 +70,71 @@ const DashboardLayout = () => {
           {/* Navigation */}
           <ul className="space-y-2">
             <li>
-              <Link to="/" className="btn btn-ghost w-full text-left">
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  isActive ? activeClass : inactiveClass
+                }
+              >
+                <MdHome size={20} />
                 Home
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link to="/dashboard/myParcels" className="btn btn-ghost w-full text-left">
+              <NavLink
+                to="/dashboard/myParcels"
+                className={({ isActive }) =>
+                  isActive ? activeClass : inactiveClass
+                }
+              >
+                <MdLocalShipping size={20} />
                 My Parcels
-              </Link>
+              </NavLink>
             </li>
             <li>
-              <Link to="/sendParcel" className="btn btn-ghost w-full text-left">
+              <NavLink
+                to="/sendParcel"
+                className={({ isActive }) =>
+                  isActive ? activeClass : inactiveClass
+                }
+              >
+                <MdSend size={20} />
                 Send Parcel
-              </Link>
+              </NavLink>
             </li>
-            
+            <li>
+              <NavLink
+                to="/dashboard/paymentHistory"
+                className={({ isActive }) =>
+                  isActive ? activeClass : inactiveClass
+                }
+              >
+                <MdPayment size={20} />
+                Payment History
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/dashboard/track"
+                className={({ isActive }) =>
+                  isActive ? activeClass : inactiveClass
+                }
+              >
+                <MdSearch size={20} />
+                Track A Parcel
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/dashboard/profile"
+                className={({ isActive }) =>
+                  isActive ? activeClass : inactiveClass
+                }
+              >
+                <MdPerson size={20} />
+                Update Profile
+              </NavLink>
+            </li>
           </ul>
         </aside>
       </div>

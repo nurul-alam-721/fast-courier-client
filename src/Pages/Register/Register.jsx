@@ -1,11 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import useAuth from "../../Hooks/useAuth";
 import GoogleLogin from "../Shared/SocialLogin/GoogleLogin";
 import { Link } from "react-router";
+import axios from "axios";
+import UseAxios from "../../Hooks/UseAxios";
 
 const Register = () => {
-  const {createUser, setUser} = useAuth();
+  const {createUser, setUser, updateProfileInfo} = useAuth();
+  const [profilePic, setProfilePic] = useState('');
+  const axiosInstance = UseAxios();
 
   const {
     register,
@@ -14,15 +18,61 @@ const Register = () => {
   } = useForm();
 
   const onSubmit = (data) => {
-    createUser(data.email, data.password)
-    .then(result=>{
-      console.log(result.user);
-      setUser(result.user);
+  createUser(data.email, data.password)
+    .then(async (result) => {
+      console.log("Firebase user created:", result.user);
+      setUser(result.user); 
+      // Prepare user data for database
+      const userInfo = {
+        email: result.user.email,
+        role: 'user',
+        created_At: new Date().toISOString(),
+        last_login: new Date().toISOString()
+      };
+
+      try {
+        // Save user to backend database
+       const res2 = await fetch('http://localhost:5000/users', {
+          method: 'POST',
+         headers: {
+          'content-type' : 'application/json'
+         },
+         body: JSON.stringify(userInfo)
+       })
+       const res3 = await res2.json();
+       console.log(res3);
+
+
+        // Update Firebase user profile
+        const updateProfileData = {
+          displayName: data.name,
+          photoURL: profilePic,
+        };
+
+        await updateProfileInfo(updateProfileData);
+        console.log("Firebase profile updated");
+
+        // Optional: Show success alert or redirect
+      } catch (err) {
+        console.error("Error saving user or updating profile:", err);
+      }
     })
-    .catch(error=>{
-      console.log(error);
-    })
-  };
+    .catch((error) => {
+      console.error("Firebase createUser error:", error);
+    });
+};
+
+
+  const handleImageUpload = async(e) =>{
+    e.preventDefault();
+    const image = e.target.files[0];
+    const formData = new FormData();
+    formData.append('image', image)
+    console.log(image);
+
+    const res = await axios.post(`https://api.imgbb.com/1/upload?expiration=600&key=${import.meta.env.VITE_imgbb_upload_key}`, formData);
+    setProfilePic(res.data.data.url);
+  }
 
   return (
     <div className="hero bg-base-200 min-h-screen">
@@ -32,12 +82,33 @@ const Register = () => {
           <h1 className="text-3xl mx-auto font-bold">Create an Account!</h1>
           <form className="card-body mb-0 pb-0" onSubmit={handleSubmit(onSubmit)}>
             <fieldset className="fieldset">
+              <label className="label">Name</label>
+              <input
+                type="text"
+                className="input"
+                {...register("name", { required: true })}
+                placeholder="Your Name"
+              />
+
               <label className="label">Email</label>
               <input
                 type="email"
                 className="input"
                 {...register("email", { required: true })}
                 placeholder="Email"
+              />
+
+              {errors.email?.type === "required" && (
+                <p className="text-red-500">Email is required.</p>
+              )}
+
+              {/* image upload */}
+              <label className="label">Profile Picture</label>
+              <input
+                type="file"
+                className="input"
+               onChange={handleImageUpload}
+                placeholder="Upload Your Profile Picture"
               />
 
               {errors.email?.type === "required" && (
