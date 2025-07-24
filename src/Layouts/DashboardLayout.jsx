@@ -9,13 +9,19 @@ import {
   MdSearch,
   MdPerson,
   MdPersonOutline,
+  MdAdminPanelSettings,
 } from "react-icons/md";
+import useUserRole from "../Hooks/useUserRole";
 
 const DashboardLayout = () => {
+  const { role, roleLoading } = useUserRole();
+
   const activeClass =
     "btn btn-primary justify-start w-full text-left flex items-center gap-2 text-black";
   const inactiveClass =
     "btn btn-ghost justify-start w-full text-left flex items-center gap-2";
+
+  if (roleLoading) return <p className="text-center py-10">Loading...</p>;
 
   return (
     <div className="drawer lg:drawer-open">
@@ -81,28 +87,46 @@ const DashboardLayout = () => {
                 Home
               </NavLink>
             </li>
-            <li>
-              <NavLink
-                to="/dashboard/activeRiders"
-                className={({ isActive }) =>
-                  isActive ? activeClass : inactiveClass
-                }
-              >
-                <MdPerson size={20} />
-                Active Riders
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/dashboard/pendingRiders"
-                className={({ isActive }) =>
-                  isActive ? activeClass : inactiveClass
-                }
-              >
-                <MdPersonOutline size={20} />
-                Pending Riders
-              </NavLink>
-            </li>
+
+            {/* Show only for admin */}
+            {role === "admin" && (
+              <>
+                <li>
+                  <NavLink
+                    to="/dashboard/activeRiders"
+                    className={({ isActive }) =>
+                      isActive ? activeClass : inactiveClass
+                    }
+                  >
+                    <MdPerson size={20} />
+                    Active Riders
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/dashboard/pendingRiders"
+                    className={({ isActive }) =>
+                      isActive ? activeClass : inactiveClass
+                    }
+                  >
+                    <MdPersonOutline size={20} />
+                    Pending Riders
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/dashboard/make-admin"
+                    className={({ isActive }) =>
+                      isActive ? activeClass : inactiveClass
+                    }
+                  >
+                    <MdAdminPanelSettings size={20} />
+                    Make Admin
+                  </NavLink>
+                </li>
+              </>
+            )}
+
             <li>
               <NavLink
                 to="/dashboard/myParcels"

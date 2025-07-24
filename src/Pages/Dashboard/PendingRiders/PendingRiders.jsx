@@ -90,7 +90,7 @@ const PendingRiders = () => {
                 <td>
                   <button className="btn btn-sm btn-info mr-2" onClick={() => setSelectedRider(rider)}>View</button>
                   <button className="btn btn-sm btn-success mr-2" onClick={() => handleApprove(rider._id)}>Approve</button>
-                  <button className="btn btn-sm btn-error" onClick={() => handleCancel(rider._id)}>Cancel</button>
+                  <button className="btn btn-sm btn-error" onClick={() => handleCancel(rider._id)}>Reject</button>
                 </td>
               </tr>
             ))}

@@ -1,19 +1,20 @@
 import React from "react";
-import {useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../../../Hooks/useAuth";
 import UseAxios from "../../../Hooks/UseAxios";
 import Swal from "sweetalert2";
 
 const GoogleLogin = () => {
-  const { loginWithGoogle, setUser } = useAuth();
+  const { loginWithGoogle } = useAuth();
   const axiosInstance = UseAxios();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.from || "/";
 
   const handleGoogleLogin = () => {
     loginWithGoogle()
       .then(async (result) => {
-        setUser(result.user);
-
         const userInfo = {
           name: result.user.displayName,
           email: result.user.email,
@@ -23,17 +24,19 @@ const GoogleLogin = () => {
           last_login: new Date().toISOString(),
         };
 
-        // Call backend to upsert user
-        await axiosInstance.post(`/users`, userInfo);
+        try {
+          await axiosInstance.post(`/users`, userInfo);
+        } catch (err) {
+          console.error("User save error:", err.response?.data || err.message);
+        }
 
-        // Show success message
         Swal.fire({
           title: "Login Successful!",
           text: "You have been logged in with Google.",
           icon: "success",
           confirmButtonText: "OK",
         }).then(() => {
-          navigate("/", { replace: true }); 
+          navigate(from, { replace: true });
         });
       })
       .catch((error) => {
@@ -60,6 +63,7 @@ const GoogleLogin = () => {
           height="16"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 512 512"
+          className="mr-2"
         >
           <path fill="#34a853" d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341" />
           <path fill="#4285f4" d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57" />

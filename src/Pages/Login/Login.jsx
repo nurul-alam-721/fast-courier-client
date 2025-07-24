@@ -18,15 +18,29 @@ const Login = () => {
   } = useForm();
 
   const onSubmit = (data) => {
-    signInUser(data.email, data.password)
-      .then(() => {
-        Swal.fire("Success", "Login Successful", "success");
-        navigate(from, { replace: true });
-      })
-      .catch((error) => {
-        Swal.fire("Error", error.message, "error");
+  signInUser(data.email, data.password)
+    .then(() => {
+      Swal.fire({
+        icon: "success",
+        title: "Login Successful",
+        timer: 2000,
+        showConfirmButton: false,
+        timerProgressBar: true,
       });
-  };
+      navigate(from, { replace: true });
+    })
+    .catch((error) => {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message,
+        timer: 2500,
+        showConfirmButton: false,
+        timerProgressBar: true,
+      });
+    });
+};
+
 
   return (
     <div>

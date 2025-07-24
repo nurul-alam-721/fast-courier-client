@@ -15,6 +15,9 @@ import TrackPercel from "../Pages/Dashboard/TrackPercel/TrackPercel";
 import BeARider from "../Pages/Dashboard/BeARider/BeARider";
 import PendingRiders from "../Pages/Dashboard/PendingRiders/PendingRiders";
 import ActiveRiders from "../Pages/Dashboard/ActiveRiders/ActiveRiders";
+import MakeAdmin from "../MakeAdmin";
+import Forbidden from "../Pages/Forbidden/Forbidden";
+import AdminRoute from "../Routes/AdminRoute";
 
 export const router = createBrowserRouter([
   {
@@ -23,7 +26,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: Home },
       { path: "coverage", Component: Coverage },
-      { path: "beARider", Component: BeARider },
+      { path: "forbidden", Component: Forbidden },
+      { path: "beARider", element: <PrivateRoute><BeARider></BeARider></PrivateRoute> },
       { path: "sendParcel", Component: SendParcel },
     ],
   },
@@ -53,7 +57,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "activeRiders",
-        Component: ActiveRiders,
+        element: <AdminRoute><ActiveRiders></ActiveRiders></AdminRoute>,
         loader: () =>
           fetch("http://localhost:5000/riders/approved").then((res) =>
             res.json()
@@ -61,7 +65,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "pendingRiders",
-        Component: PendingRiders,
+        element: <AdminRoute><PendingRiders></PendingRiders></AdminRoute>,
         loader: () =>
           fetch("http://localhost:5000/riders/pending").then((res) =>
             res.json()
@@ -78,6 +82,14 @@ export const router = createBrowserRouter([
       {
         path: "track",
         Component: TrackPercel,
+      },
+      {
+        path: "make-admin",
+        element: (
+          <AdminRoute>
+            <MakeAdmin></MakeAdmin>
+          </AdminRoute>
+        ),
       },
     ],
   },
