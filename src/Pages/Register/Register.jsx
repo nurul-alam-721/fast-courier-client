@@ -32,15 +32,8 @@ const Register = () => {
 
       try {
         // Save user to backend database
-       const res2 = await fetch('http://localhost:5000/users', {
-          method: 'POST',
-         headers: {
-          'content-type' : 'application/json'
-         },
-         body: JSON.stringify(userInfo)
-       })
-       const res3 = await res2.json();
-       console.log(res3);
+       const res = await axiosInstance.post('/users', userInfo);
+       console.log(res.data);
 
 
         // Update Firebase user profile

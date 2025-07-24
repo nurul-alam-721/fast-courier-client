@@ -8,6 +8,7 @@ import {
   MdPayment,
   MdSearch,
   MdPerson,
+  MdPersonOutline,
 } from "react-icons/md";
 
 const DashboardLayout = () => {
@@ -78,6 +79,28 @@ const DashboardLayout = () => {
               >
                 <MdHome size={20} />
                 Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/dashboard/activeRiders"
+                className={({ isActive }) =>
+                  isActive ? activeClass : inactiveClass
+                }
+              >
+                <MdPerson size={20} />
+                Active Riders
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/dashboard/pendingRiders"
+                className={({ isActive }) =>
+                  isActive ? activeClass : inactiveClass
+                }
+              >
+                <MdPersonOutline size={20} />
+                Pending Riders
               </NavLink>
             </li>
             <li>
