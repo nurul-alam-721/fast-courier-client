@@ -12,7 +12,7 @@ const ActiveRiders = () => {
   const { data: activeRiders = [], isLoading } = useQuery({
     queryKey: ["activeRiders"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/riders/approved");
+      const res = await axiosSecure.get("/riders/active");
       return res.data;
     },
   });
@@ -43,7 +43,7 @@ const ActiveRiders = () => {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Approved Riders</h2>
+      <h2 className="text-xl font-bold mb-4">Active Riders</h2>
 
       <input
         type="text"

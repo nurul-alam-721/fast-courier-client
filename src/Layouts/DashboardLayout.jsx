@@ -21,7 +21,8 @@ const DashboardLayout = () => {
   const inactiveClass =
     "btn btn-ghost justify-start w-full text-left flex items-center gap-2";
 
-  if (roleLoading) return <p className="text-center py-10">Loading...</p>;
+ if (roleLoading) {
+    return <span className="loading loading-infinity loading-xl mt-40 mx-auto flex text-center"></span>}
 
   return (
     <div className="drawer lg:drawer-open">
@@ -88,6 +89,21 @@ const DashboardLayout = () => {
               </NavLink>
             </li>
 
+            {/* Show only for rider */}
+            {role === "rider" && (
+              <li>
+                <NavLink
+                  to="/dashboard/pendingDeliveries"
+                  className={({ isActive }) =>
+                    isActive ? activeClass : inactiveClass
+                  }
+                >
+                  <MdLocalShipping size={20} />
+                  Pending Deliveries
+                </NavLink>
+              </li>
+            )}
+
             {/* Show only for admin */}
             {role === "admin" && (
               <>
@@ -122,6 +138,17 @@ const DashboardLayout = () => {
                   >
                     <MdAdminPanelSettings size={20} />
                     Make Admin
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/dashboard/assignRider"
+                    className={({ isActive }) =>
+                      isActive ? activeClass : inactiveClass
+                    }
+                  >
+                    <MdPersonOutline size={20} />
+                    Assign Rider
                   </NavLink>
                 </li>
               </>

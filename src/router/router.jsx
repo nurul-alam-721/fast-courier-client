@@ -18,6 +18,9 @@ import ActiveRiders from "../Pages/Dashboard/ActiveRiders/ActiveRiders";
 import MakeAdmin from "../MakeAdmin";
 import Forbidden from "../Pages/Forbidden/Forbidden";
 import AdminRoute from "../Routes/AdminRoute";
+import AssignRider from "../Pages/Dashboard/AssignRider/AssignRider";
+import RiderRoute from "../Routes/RiderRoute";
+import PendingDeliveries from "../Pages/Dashboard/PendingDeliveries/PendingDeliveries";
 
 export const router = createBrowserRouter([
   {
@@ -27,7 +30,14 @@ export const router = createBrowserRouter([
       { index: true, Component: Home },
       { path: "coverage", Component: Coverage },
       { path: "forbidden", Component: Forbidden },
-      { path: "beARider", element: <PrivateRoute><BeARider></BeARider></PrivateRoute> },
+      {
+        path: "beARider",
+        element: (
+          <PrivateRoute>
+            <BeARider></BeARider>
+          </PrivateRoute>
+        ),
+      },
       { path: "sendParcel", Component: SendParcel },
     ],
   },
@@ -57,19 +67,43 @@ export const router = createBrowserRouter([
       },
       {
         path: "activeRiders",
-        element: <AdminRoute><ActiveRiders></ActiveRiders></AdminRoute>,
+        element: (
+          <AdminRoute>
+            <ActiveRiders></ActiveRiders>
+          </AdminRoute>
+        ),
         loader: () =>
-          fetch("http://localhost:5000/riders/approved").then((res) =>
+          fetch("http://localhost:5000/riders/active").then((res) =>
             res.json()
           ),
       },
       {
         path: "pendingRiders",
-        element: <AdminRoute><PendingRiders></PendingRiders></AdminRoute>,
+        element: (
+          <AdminRoute>
+            <PendingRiders></PendingRiders>
+          </AdminRoute>
+        ),
         loader: () =>
           fetch("http://localhost:5000/riders/pending").then((res) =>
             res.json()
           ),
+      },
+      {
+        path: "assignRider",
+        element: (
+          <AdminRoute>
+            <AssignRider></AssignRider>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "pendingDeliveries",
+        element: (
+          <RiderRoute>
+            <PendingDeliveries></PendingDeliveries>
+          </RiderRoute>
+        ),
       },
       {
         path: "payment/:id",

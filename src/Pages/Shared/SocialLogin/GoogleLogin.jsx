@@ -5,30 +5,31 @@ import UseAxios from "../../../Hooks/UseAxios";
 import Swal from "sweetalert2";
 
 const GoogleLogin = () => {
-  const { loginWithGoogle } = useAuth();
+  const { loginWithGoogle, setUser } = useAuth();
   const axiosInstance = UseAxios();
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Get redirect path from PrivateRoute state (default to '/')
   const from = location.state?.from || "/";
 
   const handleGoogleLogin = () => {
     loginWithGoogle()
       .then(async (result) => {
+        const googleUser = result.user;
+        setUser(googleUser);
+
         const userInfo = {
-          name: result.user.displayName,
-          email: result.user.email,
-          photo: result.user.photoURL,
+          name: googleUser.displayName,
+          email: googleUser.email,
+          photo: googleUser.photoURL,
           role: "user",
           created_At: new Date().toISOString(),
           last_login: new Date().toISOString(),
         };
 
-        try {
-          await axiosInstance.post(`/users`, userInfo);
-        } catch (err) {
-          console.error("User save error:", err.response?.data || err.message);
-        }
+        // Save user in DB (upsert)
+        await axiosInstance.post("/users", userInfo);
 
         Swal.fire({
           title: "Login Successful!",
@@ -36,7 +37,7 @@ const GoogleLogin = () => {
           icon: "success",
           confirmButtonText: "OK",
         }).then(() => {
-          navigate(from, { replace: true });
+          navigate(from, { replace: true }); // Redirect to original private route
         });
       })
       .catch((error) => {
@@ -63,7 +64,6 @@ const GoogleLogin = () => {
           height="16"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 512 512"
-          className="mr-2"
         >
           <path fill="#34a853" d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341" />
           <path fill="#4285f4" d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57" />

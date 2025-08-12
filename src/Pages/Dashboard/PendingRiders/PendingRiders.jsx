@@ -23,7 +23,7 @@ const PendingRiders = () => {
   const handleApprove = async (id) => {
     try {
       await axiosSecure.patch(`/riders/approve/${id}`);
-      Swal.fire("Success", "Rider approved", "success");
+      Swal.fire("Success", "Rider active", "success");
       refetch();
     } catch {
       Swal.fire("Error", "Failed to approve rider", "error");
