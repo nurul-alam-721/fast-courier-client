@@ -10,20 +10,22 @@ import {
   MdPerson,
   MdPersonOutline,
   MdAdminPanelSettings,
+  MdOutlineDoneAll,
 } from "react-icons/md";
-import useUserRole from "../Hooks/useUserRole";
+import useUserRole from "../hooks/useUserRole";
 
 const DashboardLayout = () => {
   const { role, roleLoading } = useUserRole();
-
   const activeClass =
     "btn btn-primary justify-start w-full text-left flex items-center gap-2 text-black";
   const inactiveClass =
     "btn btn-ghost justify-start w-full text-left flex items-center gap-2";
 
- if (roleLoading) {
-    return <span className="loading loading-infinity loading-xl mt-40 mx-auto flex text-center"></span>}
-
+  if (roleLoading || !role) {
+    return (
+      <span className="loading loading-infinity loading-xl mt-40 mx-auto flex text-center"></span>
+    );
+  }
   return (
     <div className="drawer lg:drawer-open">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
@@ -90,22 +92,35 @@ const DashboardLayout = () => {
             </li>
 
             {/* Show only for rider */}
-            {role === "rider" && (
-              <li>
-                <NavLink
-                  to="/dashboard/pendingDeliveries"
-                  className={({ isActive }) =>
-                    isActive ? activeClass : inactiveClass
-                  }
-                >
-                  <MdLocalShipping size={20} />
-                  Pending Deliveries
-                </NavLink>
-              </li>
+            {!roleLoading && role === "rider" && (
+              <>
+                <li>
+                  <NavLink
+                    to="/dashboard/pendingDeliveries"
+                    className={({ isActive }) =>
+                      isActive ? activeClass : inactiveClass
+                    }
+                  >
+                    <MdLocalShipping size={20} />
+                    Pending Deliveries
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/dashboard/completedDeliveries"
+                    className={({ isActive }) =>
+                      isActive ? activeClass : inactiveClass
+                    }
+                  >
+                    <MdOutlineDoneAll size={20} />
+                    Completed Deliveries
+                  </NavLink>
+                </li>
+              </>
             )}
 
             {/* Show only for admin */}
-            {role === "admin" && (
+            {!roleLoading && role === "admin" && (
               <>
                 <li>
                   <NavLink

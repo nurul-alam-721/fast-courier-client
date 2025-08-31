@@ -39,7 +39,7 @@ const ActiveRiders = () => {
     r.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (isLoading) return <p className="text-center py-10">Loading...</p>;
+  if (isLoading) return <div className="text-center text-xl mt-50 loading-infinity loading-xl"></div>;
 
   return (
     <div className="p-4">

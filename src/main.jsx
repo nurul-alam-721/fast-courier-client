@@ -8,17 +8,20 @@ import "aos/dist/aos.css";
 import AuthProvider from "./Contexts/AuthContext/AuthProvider.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+// Initialize AOS animations
 Aos.init();
-const queryClient = new QueryClient()
+
+// React Query client
+const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <div className="urbanist-font">
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-        <RouterProvider router={router} />
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <div className="urbanist-font">
+          <RouterProvider router={router} />
+        </div>
       </AuthProvider>
-      </QueryClientProvider>
-    </div>
+    </QueryClientProvider>
   </StrictMode>
 );

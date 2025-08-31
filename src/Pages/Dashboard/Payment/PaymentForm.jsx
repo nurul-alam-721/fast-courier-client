@@ -25,8 +25,7 @@ const PaymentForm = ({ id }) => {
 
   if (isPending) {
     return (
-      <div className="text-center mt-10 font-semibold text-gray-500">
-        Loading...
+      <div className="text-center mt-50 font-semibold loading-xl loading-spinner">
       </div>
     );
   }

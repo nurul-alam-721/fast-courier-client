@@ -50,7 +50,7 @@ const PendingRiders = () => {
     }
   };
 
-  if (isPending) return <p className="text-center py-10">Loading...</p>;
+  if (isPending) return <div className="text-center text-xl mt-50 loading-infinity loading-xl"></div>;
 
   return (
     <div className="p-4">

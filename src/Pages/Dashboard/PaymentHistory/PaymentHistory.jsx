@@ -15,7 +15,8 @@ const PaymentHistory = () => {
     }
   });
 
-  if (isPending) return <div className="text-center py-10">Loading...</div>;
+  if (isPending) return  <div className="text-center mt-50 font-semibold loading-xl loading-spinner">
+      </div>;
 
   return (
     <div className="p-4">

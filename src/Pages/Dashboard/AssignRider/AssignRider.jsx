@@ -9,52 +9,74 @@ const AssignRider = () => {
 
   const [selectedParcel, setSelectedParcel] = useState(null);
   const [riders, setRiders] = useState([]);
+  const [loadingRiders, setLoadingRiders] = useState(false);
 
-  // Load paid & pending parcels
+  // Load only paid & not-collected parcels
   const { data: parcels = [], isLoading } = useQuery({
-    queryKey: ["paid-pending-parcels"],
+    queryKey: ["paid-not-collected-parcels"],
     queryFn: async () => {
       const res = await axiosSecure.get("/parcels");
       return res.data.filter(
         (parcel) =>
           parcel.payment_status === "paid" &&
-          parcel.delivery_status === "pending"
+          parcel.delivery_status === "not-collected"
       );
     },
   });
 
-  // Fetch riders when parcel is selected
-  const fetchRiders = async (region) => {
-    const res = await axiosSecure.get(`/riders/available?district=${region}`);
-    setRiders(res.data);
+  // Fetch riders based on sender_service_center
+  const fetchRiders = async (serviceCenter) => {
+    try {
+      setLoadingRiders(true);
+      const res = await axiosSecure.get(
+        `/riders/available?district=${serviceCenter}`
+      );
+      setRiders(res.data);
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to load riders", "error");
+    } finally {
+      setLoadingRiders(false);
+    }
   };
 
   const handleAssignClick = (parcel) => {
     setSelectedParcel(parcel);
-    fetchRiders(parcel.sender_region);
+    fetchRiders(parcel.sender_service_center);
     document.getElementById("assignRiderModal").showModal();
   };
 
+  // ✅ Assign rider mutation (only once)
   const assignRiderMutation = useMutation({
-  mutationFn: async ({ parcelId, rider }) => {
-    const res = await axiosSecure.patch(`/parcels/assign-rider/${parcelId}`, {
-      assigned_rider: {
-        name: rider.name,
-        email: rider.email,
-      },
-    });
-    return res.data;
-  },
-  onSuccess: () => {
-    Swal.fire("Success", "Rider assigned successfully", "success");
-    document.getElementById("assignRiderModal").close();
-    queryClient.invalidateQueries(["paid-pending-parcels"]);
-  },
-  onError: () => {
-    Swal.fire("Error", "Failed to assign rider", "error");
-  },
-});
+    mutationFn: async ({ parcelId, rider }) => {
+      // update parcel
+      const res = await axiosSecure.patch(`/parcels/assign-rider/${parcelId}`, {
+        assigned_rider: {
+          name: rider.name,
+          email: rider.email,
+        },
+        delivery_status: "in-transit",
+      });
 
+      // update rider
+      await axiosSecure.patch(`/riders/update-status/${rider._id}`, {
+        status: "in-delivery", // ✅ update rider status
+      });
+
+      return res.data;
+    },
+    onSuccess: () => {
+      const modal = document.getElementById("assignRiderModal");
+      if (modal) modal.close();
+      Swal.fire("Success", "Rider assigned successfully", "success");
+      queryClient.invalidateQueries(["paid-not-collected-parcels"]);
+    },
+    onError: () => {
+      const modal = document.getElementById("assignRiderModal");
+      if (modal) modal.close();
+      Swal.fire("Error", "Failed to assign rider", "error");
+    },
+  });
 
   if (isLoading) {
     return <div className="text-center py-20 text-lg">Loading parcels...</div>;
@@ -88,18 +110,23 @@ const AssignRider = () => {
                 <td>{parcel.tracking_id}</td>
                 <td>
                   <p className="font-medium">{parcel.sender_name}</p>
-                  <p className="text-sm text-gray-500">{parcel.sender_contact}</p>
+                  <p className="text-sm text-gray-500">
+                    {parcel.sender_contact}
+                  </p>
                 </td>
                 <td>
                   <p className="font-medium">{parcel.receiver_name}</p>
-                  <p className="text-sm text-gray-500">{parcel.receiver_contact}</p>
+                  <p className="text-sm text-gray-500">
+                    {parcel.receiver_contact}
+                  </p>
                 </td>
                 <td>
                   <p>
                     {parcel.sender_region} → {parcel.receiver_region}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {parcel.sender_service_center} → {parcel.receiver_service_center}
+                    {parcel.sender_service_center} →{" "}
+                    {parcel.receiver_service_center}
                   </p>
                 </td>
                 <td>৳{parcel.cost}</td>
@@ -110,14 +137,14 @@ const AssignRider = () => {
                   </span>
                 </td>
                 <td>
-                  <span className="badge badge-warning text-white capitalize">
+                  <span className="badge badge-warning h-auto text-black capitalize">
                     {parcel.delivery_status}
                   </span>
                 </td>
                 <td>
                   <button
                     onClick={() => handleAssignClick(parcel)}
-                    className="btn btn-sm btn-primary text-black"
+                    className="btn btn-sm btn-primary text-black h-auto"
                   >
                     Assign Rider
                   </button>
@@ -131,17 +158,25 @@ const AssignRider = () => {
       {/* Assign Rider Modal */}
       <dialog id="assignRiderModal" className="modal">
         <div className="modal-box max-w-md">
-          <h3 className="font-bold text-xl mb-4">Select Rider</h3>
-          {riders.length > 0 ? (
+          <h3 className="font-bold text-xl mb-4">
+            Select Rider for {selectedParcel?.sender_service_center}
+          </h3>
+
+          {loadingRiders ? (
+            <p className="text-center text-gray-500">Loading riders...</p>
+          ) : riders.length > 0 ? (
             <ul className="space-y-2">
               {riders.map((rider) => (
                 <li
-                  key={rider.email}
+                  key={rider._id}
                   className="border p-3 rounded-lg flex items-center justify-between"
                 >
                   <div>
                     <p className="font-semibold">{rider.name}</p>
                     <p className="text-sm text-gray-500">{rider.email}</p>
+                    <p className="text-xs text-gray-400">
+                      District: {rider.district}
+                    </p>
                   </div>
                   <button
                     onClick={() =>
@@ -158,7 +193,9 @@ const AssignRider = () => {
               ))}
             </ul>
           ) : (
-            <p className="text-gray-500">No available riders in this region.</p>
+            <p className="text-gray-500">
+              No available riders in {selectedParcel?.sender_service_center}.
+            </p>
           )}
 
           <div className="modal-action">

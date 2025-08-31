@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { AuthContext } from "./AuthContext";
+import React, { createContext, useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -10,37 +9,46 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../../firebase/firebase.init";
+import { AuthContext } from "./AuthContext";
 
+
+// Google provider
 const googleProvider = new GoogleAuthProvider();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Register with email/password
   const createUser = (email, password) => {
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
+  // Login with email/password
   const signInUser = (email, password) => {
     setLoading(true);
     return signInWithEmailAndPassword(auth, email, password);
   };
 
+  // Google login
   const loginWithGoogle = () => {
     setLoading(true);
     return signInWithPopup(auth, googleProvider);
   };
 
+  // Logout
   const signOutUser = () => {
     setLoading(true);
     return signOut(auth);
   };
 
-  const updateProfileInfo = (profileInfo) => {
+  // Update profile (name, photo, etc.)
+  const updateUserProfile = (profileInfo) => {
     return updateProfile(auth.currentUser, profileInfo);
   };
 
+  // Observe user state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -50,6 +58,7 @@ const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+  // Shared values
   const AuthInfo = {
     user,
     setUser,
@@ -59,10 +68,11 @@ const AuthProvider = ({ children }) => {
     signInUser,
     loginWithGoogle,
     signOutUser,
-    updateProfileInfo,
+    updateUserProfile,
   };
-
-  return <AuthContext.Provider value={AuthInfo}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext value={AuthInfo}>{children}</AuthContext>
+  );
 };
 
 export default AuthProvider;
