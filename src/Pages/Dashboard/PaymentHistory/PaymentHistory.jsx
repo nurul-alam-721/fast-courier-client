@@ -27,6 +27,7 @@ const PaymentHistory = () => {
             <tr>
               <th>#</th>
               <th>Parcel ID</th>
+              <th>Parcel Title</th>
               <th>Amount</th>
               <th>Transaction ID</th>
               <th>Payment Method</th>
@@ -45,6 +46,7 @@ const PaymentHistory = () => {
                 <tr key={payment._id} className="hover">
                   <td>{index + 1}</td>
                   <td>{payment.parcelId}</td>
+                  <td>{payment.title}</td>
                   <td>৳{payment.amount}</td>
                   <td>{payment.transactionId}</td>
                   <td>{payment.paymentMethod?.[0] || 'N/A'}</td>

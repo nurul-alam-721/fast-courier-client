@@ -10,29 +10,32 @@ const PendingDeliveries = () => {
   const queryClient = useQueryClient();
 
   // Fetch assigned parcels
-  const { data: parcels = [], isLoading } = useQuery({
-    queryKey: ["assignedParcels", user?.email],
-    enabled: !!user?.email,
-    queryFn: async () => {
-      const res = await axiosSecure.get(
-        `/parcels/assigned?riderEmail=${user.email}`
-      );
-      return res.data;
-    },
-  });
-
+const { data: parcels = [], isLoading } = useQuery({
+  queryKey: ["assignedParcels", user?.email],
+  enabled: !!user?.email,
+  queryFn: async () => {
+    const res = await axiosSecure.get("/parcels/assigned");
+    return res.data;
+  },
+});
   // Mutation to update delivery status
   const updateStatusMutation = useMutation({
     mutationFn: async ({ parcelId, newStatus }) => {
       const res = await axiosSecure.patch(
         `/parcels/update-status/${parcelId}`,
-        { newStatus }
+        {
+          newStatus,
+        }
       );
-      return res.data;
+      return { parcelId, newStatus, data: res.data };
     },
-    onSuccess: (_, { newStatus }) => {
-      queryClient.invalidateQueries(["assignedParcels", user?.email]);
-      // Show success alert
+    onSuccess: ({ parcelId, newStatus }) => {
+      queryClient.setQueryData(["assignedParcels", user?.email], (old) =>
+        old?.map((p) =>
+          p._id === parcelId ? { ...p, delivery_status: newStatus } : p
+        )
+      );
+
       Swal.fire({
         icon: "success",
         title: `Delivery status updated to "${newStatus}"`,
@@ -97,7 +100,7 @@ const PendingDeliveries = () => {
                   </td>
                   <td>{parcel.sender_service_center}</td>
                   <td className="capitalize">{parcel.delivery_status}</td>
-                  <td>${parcel.cost}</td>
+                  <td>৳{parcel.cost}</td>
                   <td>
                     {(parcel.delivery_status === "rider-assigned" ||
                       parcel.delivery_status === "in-transit") && (

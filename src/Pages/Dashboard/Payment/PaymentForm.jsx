@@ -15,7 +15,7 @@ const PaymentForm = ({ id }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const { isPending, data: parcelInfo } = useQuery({
+  const { isLoading: queryLoading, data: parcelInfo } = useQuery({
     queryKey: ["parcels", id],
     queryFn: async () => {
       const res = await axiosSecure.get(`/parcels/${id}`);
@@ -23,14 +23,15 @@ const PaymentForm = ({ id }) => {
     },
   });
 
-  if (isPending) {
+  if (queryLoading || !parcelInfo) {
     return (
-      <div className="text-center mt-50 font-semibold loading-xl loading-spinner">
+      <div className="text-center mt-10 font-semibold loading-xl loading-spinner">
+        Loading parcel info...
       </div>
     );
   }
 
-  const amount = parcelInfo.cost;
+  const amount = Number(parcelInfo.cost || 0);
   const amountInCents = amount * 100;
 
   const handleFormSubmit = async (e) => {
@@ -42,18 +43,6 @@ const PaymentForm = ({ id }) => {
 
     setIsLoading(true);
     setError("");
-
-    // Create Payment Method
-    const { error: stripeError } = await stripe.createPaymentMethod({
-      type: "card",
-      card,
-    });
-
-    if (stripeError) {
-      setError(stripeError.message);
-      setIsLoading(false);
-      return;
-    }
 
     try {
       // Create PaymentIntent
@@ -78,24 +67,21 @@ const PaymentForm = ({ id }) => {
       if (result.error) {
         setError(result.error.message);
       } else if (result.paymentIntent?.status === "succeeded") {
-        console.log("✅ Payment succeeded:", result.paymentIntent);
-
         const paymentData = {
           parcelId: id,
           amount,
+          title: parcelInfo.title,
           transactionId: result.paymentIntent.id,
           email: parcelInfo.created_email,
           sender_name: parcelInfo.sender_name,
           paymentMethod: result.paymentIntent.payment_method_types,
           date: new Date(),
-          paid_at_string: new Date().toISOString(),
         };
 
         // Save payment info to DB
         const paymentRes = await axiosSecure.post("/payments", paymentData);
 
         if (paymentRes.data?.insertedId) {
-          // Show success alert
           await Swal.fire({
             icon: "success",
             title: "Payment Successful!",
@@ -104,19 +90,15 @@ const PaymentForm = ({ id }) => {
             timerProgressBar: true,
             showConfirmButton: false,
           });
-
-          // Redirect to MyParcels page
           navigate("/dashboard/myparcels");
         } else {
-          console.error("⚠️ Payment DB insert failed");
           setError("Payment succeeded but recording failed.");
         }
       } else {
-        console.log("⚠️ Payment status:", result.paymentIntent?.status);
         setError("Payment failed. Please try again.");
       }
     } catch (err) {
-      console.error("❌ Payment error:", err);
+      console.error("Payment error:", err);
       setError("Payment failed. Try again.");
     }
 

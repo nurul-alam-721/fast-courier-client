@@ -90,14 +90,7 @@ export const router = createBrowserRouter([
             res.json()
           ),
       },
-      {
-        path: "assignRider",
-        element: (
-          <AdminRoute>
-            <AssignRider></AssignRider>
-          </AdminRoute>
-        ),
-      },
+      
       {
         path: "pendingDeliveries",
         element: (
@@ -131,6 +124,14 @@ export const router = createBrowserRouter([
         element: (
           <AdminRoute>
             <MakeAdmin></MakeAdmin>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "assign-rider",
+        element: (
+          <AdminRoute>
+            <AssignRider></AssignRider>
           </AdminRoute>
         ),
       },

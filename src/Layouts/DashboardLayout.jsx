@@ -26,6 +26,7 @@ const DashboardLayout = () => {
       <span className="loading loading-infinity loading-xl mt-40 mx-auto flex text-center"></span>
     );
   }
+
   return (
     <div className="drawer lg:drawer-open">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
@@ -157,7 +158,7 @@ const DashboardLayout = () => {
                 </li>
                 <li>
                   <NavLink
-                    to="/dashboard/assignRider"
+                    to="/dashboard/assign-rider"
                     className={({ isActive }) =>
                       isActive ? activeClass : inactiveClass
                     }
