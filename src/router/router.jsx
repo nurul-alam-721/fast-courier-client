@@ -22,6 +22,8 @@ import AssignRider from "../Pages/Dashboard/AssignRider/AssignRider";
 import RiderRoute from "../Routes/RiderRoute";
 import PendingDeliveries from "../Pages/Dashboard/PendingDeliveries/PendingDeliveries";
 import CompletedDeliveries from "../Pages/Dashboard/CompletedDeliveries/CompletedDeliveries";
+import MyEarnings from "../Pages/Dashboard/MyEarnings/MyEarnings";
+import DashboardHome from "../Pages/Dashboard/DashboardHome/DashboardHome";
 
 export const router = createBrowserRouter([
   {
@@ -57,7 +59,12 @@ export const router = createBrowserRouter([
         <DashboardLayout />
       </PrivateRoute>
     ),
+    
     children: [
+      {
+        index: true, 
+        Component: DashboardHome
+      },
       {
         path: "myParcels",
         element: (
@@ -72,11 +79,7 @@ export const router = createBrowserRouter([
           <AdminRoute>
             <ActiveRiders></ActiveRiders>
           </AdminRoute>
-        ),
-        loader: () =>
-          fetch("http://localhost:5000/riders/active").then((res) =>
-            res.json()
-          ),
+        )
       },
       {
         path: "pendingRiders",
@@ -84,11 +87,7 @@ export const router = createBrowserRouter([
           <AdminRoute>
             <PendingRiders></PendingRiders>
           </AdminRoute>
-        ),
-        loader: () =>
-          fetch("http://localhost:5000/riders/pending").then((res) =>
-            res.json()
-          ),
+        )
       },
       
       {
@@ -104,6 +103,14 @@ export const router = createBrowserRouter([
         element: (
           <RiderRoute>
             <CompletedDeliveries></CompletedDeliveries>
+          </RiderRoute>
+        ),
+      },
+      {
+        path: "my-earnings",
+        element: (
+          <RiderRoute>
+           <MyEarnings></MyEarnings>
           </RiderRoute>
         ),
       },

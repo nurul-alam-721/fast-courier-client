@@ -1,11 +1,12 @@
+// src/Hooks/UseAxios.js
 import axios from "axios";
 
-const AxiosInstance = axios.create({
-    baseURL: 'http://localhost:5000'
-})
-
 const UseAxios = () => {
-    return AxiosInstance;
+  const axiosInstance = axios.create({
+    baseURL: "https://fast-courier-server.vercel.app",
+  });
+
+  return axiosInstance;
 };
 
 export default UseAxios;

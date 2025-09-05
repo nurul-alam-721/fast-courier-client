@@ -44,9 +44,13 @@ const AuthProvider = ({ children }) => {
   };
 
   // Update profile (name, photo, etc.)
-  const updateUserProfile = (profileInfo) => {
-    return updateProfile(auth.currentUser, profileInfo);
-  };
+  const updateUserProfile = (name, photoURL) => {
+  return updateProfile(auth.currentUser, {
+    displayName: name,
+    photoURL: photoURL,
+  });
+};
+
 
   // Observe user state
   useEffect(() => {

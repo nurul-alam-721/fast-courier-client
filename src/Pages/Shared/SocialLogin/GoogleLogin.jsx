@@ -56,7 +56,7 @@ const GoogleLogin = () => {
       <div className="divider">OR</div>
       <button
         onClick={handleGoogleLogin}
-        className="btn bg-white text-black border-[#e5e5e5] w-full"
+        className="btn bg-white text-black border-[#e5e5e5] w-full rounded-full"
       >
         <svg
           aria-label="Google logo"

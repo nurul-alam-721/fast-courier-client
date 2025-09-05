@@ -3,33 +3,33 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Swal from "sweetalert2";
 import useAuth from "../../../Hooks/useAuth";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
+import useParcelTracking from "../../../Hooks/useParcelTracking";
 
 const PendingDeliveries = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
+  const { updateTrackingStatus } = useParcelTracking();
 
   // Fetch assigned parcels
-const { data: parcels = [], isLoading } = useQuery({
-  queryKey: ["assignedParcels", user?.email],
-  enabled: !!user?.email,
-  queryFn: async () => {
-    const res = await axiosSecure.get("/parcels/assigned");
-    return res.data;
-  },
-});
+  const { data: parcels = [], isLoading } = useQuery({
+    queryKey: ["assignedParcels", user?.email],
+    enabled: !!user?.email,
+    queryFn: async () => {
+      const res = await axiosSecure.get("/parcels/assigned");
+      return res.data;
+    },
+  });
+
   // Mutation to update delivery status
   const updateStatusMutation = useMutation({
     mutationFn: async ({ parcelId, newStatus }) => {
-      const res = await axiosSecure.patch(
-        `/parcels/update-status/${parcelId}`,
-        {
-          newStatus,
-        }
-      );
+      const res = await axiosSecure.patch(`/parcels/update-status/${parcelId}`, {
+        newStatus,
+      });
       return { parcelId, newStatus, data: res.data };
     },
-    onSuccess: ({ parcelId, newStatus }) => {
+    onSuccess: async ({ parcelId, newStatus }) => {
       queryClient.setQueryData(["assignedParcels", user?.email], (old) =>
         old?.map((p) =>
           p._id === parcelId ? { ...p, delivery_status: newStatus } : p
@@ -41,6 +41,17 @@ const { data: parcels = [], isLoading } = useQuery({
         title: `Delivery status updated to "${newStatus}"`,
         timer: 1500,
         showConfirmButton: false,
+      });
+
+      // Send tracking event
+      await updateTrackingStatus({
+        parcelId,
+        updatedBy: user?.email,
+        status: newStatus,
+        details:
+          newStatus === "in-transit"
+            ? "Parcel is out for delivery"
+            : "Parcel delivered successfully",
       });
     },
   });

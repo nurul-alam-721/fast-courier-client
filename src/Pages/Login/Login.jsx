@@ -1,10 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import GoogleLogin from "../Shared/SocialLogin/GoogleLogin";
+import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import useAuth from "../../Hooks/useAuth";
-import { FaEnvelope, FaLock } from "react-icons/fa";
+import GoogleLogin from "../Shared/SocialLogin/GoogleLogin";
 
 const Login = () => {
   const { signInUser } = useAuth();
@@ -42,121 +41,67 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div className="bg-gradient-to-r from-purple-500 to-teal-500 p-8 text-center">
-          <h2 className="text-3xl font-bold text-white">Welcome Back</h2>
-          <p className="text-purple-100 mt-2">Login to access your account</p>
-        </div>
+    <div className="flex justify-center items-center min-h-screen bg-base-200 px-4">
+      <div className="card w-full max-w-md shadow-2xl bg-base-100">
+        <div className="card-body">
+          <h1 className="text-3xl font-bold text-center mb-4">Login</h1>
+          <p className="text-center text-gray-500 mb-6">
+            Login to access your account
+          </p>
 
-        <div className="p-8">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaEnvelope className="text-gray-400" />
-              </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
               <input
                 type="email"
+                placeholder="Your Email"
+                className="input input-bordered w-full"
                 {...register("email", { required: "Email is required" })}
-                placeholder="Your email address"
-                autoComplete="username" // ✅ Add this
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg 
-             focus:ring-2 focus:ring-purple-500 focus:border-purple-500 
-             transition duration-200 placeholder-gray-400 text-gray-700"
               />
-
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1 flex items-center">
-                  <svg
-                    className="w-4 h-4 mr-1"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  {errors.email.message}
-                </p>
+                <p className="text-red-500 text-sm">{errors.email.message}</p>
               )}
             </div>
 
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaLock className="text-gray-400" />
-              </div>
+            {/* Password */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Password</label>
               <input
                 type="password"
+                placeholder="Your password"
+                className="input input-bordered w-full"
                 {...register("password", {
                   required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Password must be at least 6 characters",
-                  },
+                  minLength: { value: 6, message: "Minimum 6 characters" },
                 })}
-                placeholder="Your password"
-                autoComplete="current-password" // ✅ Add this
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg 
-             focus:ring-2 focus:ring-purple-500 focus:border-purple-500 
-             transition duration-200 placeholder-gray-400 text-gray-700"
               />
-
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1 flex items-center">
-                  <svg
-                    className="w-4 h-4 mr-1"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  {errors.password.message}
-                </p>
+                <p className="text-red-500 text-sm">{errors.password.message}</p>
               )}
             </div>
 
-            <div className="flex justify-end">
-              <a
-                href="#"
-                className="text-sm text-purple-600 hover:text-purple-800 transition duration-200"
+            {/* Submit */}
+            <div>
+              <button
+                type="submit"
+                className="btn btn-primary text-black w-full rounded-full"
               >
-                Forgot password?
-              </a>
+                Login
+              </button>
             </div>
-
-            <button
-              className="w-full bg-gradient-to-r from-purple-500 to-teal-500 text-white font-semibold py-3 px-4 rounded-lg hover:from-purple-600 hover:to-teal-600 transition duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 shadow-md"
-              type="submit"
-            >
-              Login
-            </button>
           </form>
-
-          <div className="mt-8 flex items-center">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="mx-4 text-gray-500 text-sm">OR</span>
-            <div className="flex-grow border-t border-gray-300"></div>
-          </div>
 
           <div className="mt-6">
             <GoogleLogin />
           </div>
 
-          <div className="mt-8 text-center text-sm text-gray-600">
+          <p className="text-center text-sm text-gray-500 mt-4">
             New to this site?{" "}
-            <Link
-              to="/register"
-              className="font-medium text-purple-600 hover:text-purple-800 transition duration-200"
-            >
+            <a href="/register" className="link link-primary">
               Create an account
-            </Link>
-          </div>
+            </a>
+          </p>
         </div>
       </div>
     </div>

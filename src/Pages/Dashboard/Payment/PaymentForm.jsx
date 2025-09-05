@@ -5,6 +5,7 @@ import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import useAuth from "../../../Hooks/useAuth";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import useParcelTracking from "../../../Hooks/useParcelTracking";
 
 const PaymentForm = ({ id }) => {
   const stripe = useStripe();
@@ -14,6 +15,7 @@ const PaymentForm = ({ id }) => {
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { updateTrackingStatus } = useParcelTracking();
 
   const { isLoading: queryLoading, data: parcelInfo } = useQuery({
     queryKey: ["parcels", id],
@@ -90,6 +92,13 @@ const PaymentForm = ({ id }) => {
             timerProgressBar: true,
             showConfirmButton: false,
           });
+          await updateTrackingStatus({
+            parcelId: id,
+            status: "paid",
+            updatedBy: user.email,
+            details: `Parcel cost paid by ${user.displayName}`
+          });
+
           navigate("/dashboard/myparcels");
         } else {
           setError("Payment succeeded but recording failed.");

@@ -11,8 +11,9 @@ import {
   MdPersonOutline,
   MdAdminPanelSettings,
   MdOutlineDoneAll,
+  MdAttachMoney,
 } from "react-icons/md";
-import useUserRole from "../hooks/useUserRole";
+import useUserRole from "../Hooks/useUserRole";
 
 const DashboardLayout = () => {
   const { role, roleLoading } = useUserRole();
@@ -117,6 +118,17 @@ const DashboardLayout = () => {
                     Completed Deliveries
                   </NavLink>
                 </li>
+                <li>
+                  <NavLink
+                    to="/dashboard/my-earnings"
+                    className={({ isActive }) =>
+                      isActive ? activeClass : inactiveClass
+                    }
+                  >
+                    <MdAttachMoney size={20} />
+                    My Earnings
+                  </NavLink>
+                </li>
               </>
             )}
 
@@ -170,50 +182,56 @@ const DashboardLayout = () => {
               </>
             )}
 
-            <li>
-              <NavLink
-                to="/dashboard/myParcels"
-                className={({ isActive }) =>
-                  isActive ? activeClass : inactiveClass
-                }
-              >
-                <MdLocalShipping size={20} />
-                My Parcels
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/sendParcel"
-                className={({ isActive }) =>
-                  isActive ? activeClass : inactiveClass
-                }
-              >
-                <MdSend size={20} />
-                Send Parcel
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/dashboard/paymentHistory"
-                className={({ isActive }) =>
-                  isActive ? activeClass : inactiveClass
-                }
-              >
-                <MdPayment size={20} />
-                Payment History
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/dashboard/track"
-                className={({ isActive }) =>
-                  isActive ? activeClass : inactiveClass
-                }
-              >
-                <MdSearch size={20} />
-                Track A Parcel
-              </NavLink>
-            </li>
+            {!roleLoading && role === "user" && (
+              <>
+                <li>
+                  <NavLink
+                    to="/dashboard/myParcels"
+                    className={({ isActive }) =>
+                      isActive ? activeClass : inactiveClass
+                    }
+                  >
+                    <MdLocalShipping size={20} />
+                    My Parcels
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/sendParcel"
+                    className={({ isActive }) =>
+                      isActive ? activeClass : inactiveClass
+                    }
+                  >
+                    <MdSend size={20} />
+                    Send Parcel
+                  </NavLink>
+                </li>
+
+                <li>
+                  <NavLink
+                    to="/dashboard/paymentHistory"
+                    className={({ isActive }) =>
+                      isActive ? activeClass : inactiveClass
+                    }
+                  >
+                    <MdPayment size={20} />
+                    Payment History
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/dashboard/track"
+                    className={({ isActive }) =>
+                      isActive ? activeClass : inactiveClass
+                    }
+                  >
+                    <MdSearch size={20} />
+                    Track A Parcel
+                  </NavLink>
+                </li>
+              </>
+            )}
+
             <li>
               <NavLink
                 to="/dashboard/profile"

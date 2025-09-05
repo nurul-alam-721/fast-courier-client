@@ -39,7 +39,10 @@ const ActiveRiders = () => {
     r.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (isLoading) return <div className="text-center text-xl mt-50 loading-infinity loading-xl"></div>;
+  if (isLoading)
+    return (
+      <div className="text-center text-xl mt-50 loading-infinity loading-xl"></div>
+    );
 
   return (
     <div className="p-4">
@@ -61,6 +64,7 @@ const ActiveRiders = () => {
               <th>Name</th>
               <th>Email</th>
               <th>Phone</th>
+              <th>Status</th> {/* new column */}
               <th>Action</th>
             </tr>
           </thead>
@@ -72,17 +76,38 @@ const ActiveRiders = () => {
                 <td>{rider.email}</td>
                 <td>{rider.phone || "N/A"}</td>
                 <td>
-                  <button className="btn btn-sm btn-info mr-2" onClick={() => setSelectedRider(rider)}>View</button>
-                  <button className="btn btn-sm btn-warning mr-2" onClick={() => removeApprovalMutation.mutate(rider._id)}>Remove Approval</button>
-                  <button className="btn btn-sm btn-error" onClick={() => deleteMutation.mutate(rider._id)}>Delete</button>
+                  <span
+                    className={`badge ${
+                      rider.status === "available"
+                        ? "badge-success"
+                        : "badge-warning"
+                    }`}
+                  >
+                    {rider.status}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    className="btn btn-sm btn-info mr-2"
+                    onClick={() => setSelectedRider(rider)}
+                  >
+                    View
+                  </button>
+                  <button
+                    className="btn btn-sm btn-warning mr-2"
+                    onClick={() => removeApprovalMutation.mutate(rider._id)}
+                  >
+                    Remove Approval
+                  </button>
+                  <button
+                    className="btn btn-sm btn-error"
+                    onClick={() => deleteMutation.mutate(rider._id)}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
-            {filteredRiders.length === 0 && (
-              <tr>
-                <td colSpan="5" className="text-center">No matching riders found.</td>
-              </tr>
-            )}
           </tbody>
         </table>
       </div>
@@ -91,16 +116,34 @@ const ActiveRiders = () => {
         <dialog open className="modal">
           <div className="modal-box">
             <h3 className="font-bold text-lg mb-2">Rider Info</h3>
-            <p><strong>Name:</strong> {selectedRider.name}</p>
-            <p><strong>Email:</strong> {selectedRider.email}</p>
-            <p><strong>Phone:</strong> {selectedRider.phone || "N/A"}</p>
-            <p><strong>Region:</strong> {selectedRider.region}</p>
-            <p><strong>District:</strong> {selectedRider.district}</p>
-            <p><strong>NID:</strong> {selectedRider.nid || "N/A"}</p>
-            <p><strong>Bike Brand:</strong> {selectedRider.bikeBrand || "N/A"}</p>
-            <p><strong>Bike Reg No:</strong> {selectedRider.bikeRegNo || "N/A"}</p>
+            <p>
+              <strong>Name:</strong> {selectedRider.name}
+            </p>
+            <p>
+              <strong>Email:</strong> {selectedRider.email}
+            </p>
+            <p>
+              <strong>Phone:</strong> {selectedRider.phone || "N/A"}
+            </p>
+            <p>
+              <strong>Region:</strong> {selectedRider.region}
+            </p>
+            <p>
+              <strong>District:</strong> {selectedRider.district}
+            </p>
+            <p>
+              <strong>NID:</strong> {selectedRider.nid || "N/A"}
+            </p>
+            <p>
+              <strong>Bike Brand:</strong> {selectedRider.bikeBrand || "N/A"}
+            </p>
+            <p>
+              <strong>Bike Reg No:</strong> {selectedRider.bikeRegNo || "N/A"}
+            </p>
             <div className="modal-action">
-              <button className="btn" onClick={() => setSelectedRider(null)}>Close</button>
+              <button className="btn" onClick={() => setSelectedRider(null)}>
+                Close
+              </button>
             </div>
           </div>
         </dialog>

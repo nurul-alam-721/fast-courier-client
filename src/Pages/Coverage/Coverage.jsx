@@ -79,7 +79,7 @@ const Coverage = () => {
         <button
           onClick={handleSearch}
           // Tailwind CSS classes for styling the button
-          className="btn btn-primary btn-lg px-8 shadow-md hover:scale-105 transition-transform duration-200 ease-in-out"
+          className="btn btn-primary text-black btn-lg px-8 shadow-md hover:scale-105 transition-transform duration-200 ease-in-out"
         >
           Search
         </button>
@@ -90,7 +90,7 @@ const Coverage = () => {
         <MapContainer
           center={[23.685, 90.3563]} // Initial map center (Bangladesh)
           zoom={7} // Initial zoom level
-          scrollWheelZoom={true} // Enable zooming with mouse scroll
+          scrollWheelZoom={false} // Enable zooming with mouse scroll
           style={{ height: "100%", width: "100%" }} // Make map fill its container
         >
           {/* Tile Layer (Base Map) */}
